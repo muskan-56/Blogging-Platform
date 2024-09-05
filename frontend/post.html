@@ -1,0 +1,109 @@
+<?php include 'backend/check_session.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Posts</title>
+    <link rel="stylesheet" href="post.css" />
+  </head>
+  <body>
+    <header>
+      <h1>All Posts</h1>
+      <div class="header-buttons">
+        <a href="create_post.html" class="button create-post-button"
+          >Create Post</a
+        >
+        <a href="../backend/logout.php" class="button logout-button">Logout</a>
+      </div>
+    </header>
+    <main id="postsContainer">
+      <!-- Posts will be dynamically inserted here -->
+    </main>
+    <footer>
+      <p>&copy; 2024 Blog Website</p>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchPosts();
+      });
+
+      function fetchPosts() {
+        fetch("http://localhost/Bloging_Website_2/backend/get_posts.php")
+          .then((response) => response.json())
+          .then((posts) => {
+            const postsContainer = document.getElementById("postsContainer");
+            posts.forEach((post) => {
+              const postElement = document.createElement("div");
+              postElement.classList.add("post");
+              postElement.innerHTML = `
+                            <h2>${post.title}</h2>
+                            <p class="post-meta">Created by ${post.username}</p>
+                            <p>${post.content}</p>
+                            <div class="comments" id="comments-${post.id}">
+                                <h3>Comments</h3>
+                                <div class="commentsList" id="commentsList-${post.id}"></div>
+                                <textarea id="commentInput-${post.id}" placeholder="Add a comment..."></textarea>
+                                <button onclick="addComment(${post.id})">Submit</button>
+                            </div>
+                        `;
+              postsContainer.appendChild(postElement);
+              fetchComments(post.id);
+            });
+          });
+      }
+
+      function fetchComments(postId) {
+        fetch(
+          `http://localhost/Bloging_Website_2/backend/get_comments.php?post_id=${postId}`
+        )
+          .then((response) => response.json())
+          .then((comments) => {
+            const commentsList = document.getElementById(
+              `commentsList-${postId}`
+            );
+            commentsList.innerHTML = "";
+            comments.forEach((comment) => {
+              const commentElement = document.createElement("div");
+              commentElement.classList.add("comment");
+              commentElement.innerHTML = `
+                            <p>${comment.content}</p>
+                            <small>By ${comment.username} on ${new Date(
+                comment.created_at
+              ).toLocaleString()}</small>
+                        `;
+              commentsList.appendChild(commentElement);
+            });
+          });
+      }
+
+      function addComment(postId) {
+        const commentInput = document.getElementById(
+          `commentInput-${postId}`
+        ).value;
+        if (commentInput) {
+          fetch(
+            "http://localhost/Bloging_Website_2/backend/create_comment.php",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: `post_id=${postId}&content=${encodeURIComponent(
+                commentInput
+              )}`,
+            }
+          )
+            .then((response) => response.text())
+            .then((result) => {
+              fetchComments(postId);
+              document.getElementById(`commentInput-${postId}`).value = "";
+            });
+        } else {
+          alert("Please enter a comment.");
+        }
+      }
+    </script>
+  </body>
+</html>

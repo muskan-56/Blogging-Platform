@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Post</title>
+    <link rel="stylesheet" href="createPost.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Create Post</h1>
+    </header>
+    <main>
+      <form
+        id="createPostForm"
+        action="http://localhost/Bloging_Website_2/backend/create_post.php"
+        method="POST"
+      >
+        <div>
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required />
+        </div>
+        <div>
+          <label for="content">Content:</label>
+          <textarea id="content" name="content" required></textarea>
+        </div>
+        <div>
+          <button type="submit">Create Post</button>
+        </div>
+      </form>
+    </main>
+    <footer>
+      <p>&copy; 2024 Blog Website</p>
+    </footer>
+  </body>
+</html>
